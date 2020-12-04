@@ -7,8 +7,8 @@ object Day1B extends App {
     val entries : Iterable[(Int, Int)] = f.lines.map(_.toInt).zipWithIndex
     for {
       (a, i1) <- entries
-      (b, i2) <- entries
-      (c, i3) <- entries if a + b + c == 2020 && i1 != i2 && i2 != i3 && i1 != i3
+      (b, i2) <- entries.drop(i1 + 1)
+      (c, _) <- entries.drop(i2 + 1) if a + b + c == 2020
     } yield a * b * c
   }.headOption
 
