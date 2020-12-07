@@ -2,7 +2,7 @@ import better.files._
 
 import atto._, Atto._
 
-object Day7A extends App {
+object Day7B extends App {
   import Day7Model._
   val f = file"./files/day7/input"
 
@@ -13,8 +13,10 @@ object Day7A extends App {
     .map(_.done.option.get)
       .toSeq
 
-  println("Day7A:")
-  println(rules.count(_.contains(Bag("shiny", "gold"))(rules)))
+  val shinyGoldBagRule = rules.find(_.selfBag == Bag("shiny", "gold")).get
+
+  println("Day7B:")
+  println(shinyGoldBagRule.numberOfBagsInside(rules))
 
 }
 
