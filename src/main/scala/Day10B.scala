@@ -5,20 +5,15 @@ object Day10B extends App {
 
   val adapters: Seq[Int] = f.lines.map(_.toInt).toSeq
   val output = adapters.max + 3
-  val steps = (0 +: adapters).toSet
-
-  def numberOfWays(n : Int) : Int = {
-    if (n == 0) 1
-    else
-      (if (steps.contains(n - 1)) numberOfWays(n - 1) else 0) +
-        (if (steps.contains(n - 2)) numberOfWays(n - 2) else 0) +
-        (if (steps.contains(n - 3)) numberOfWays(n - 3) else 0)
-  }
-
-
-  val now = numberOfWays(output)
+  val steps = (adapters :+ output).sorted
+  val numberOfWays : Map[Int, Long] = steps.foldLeft(Map(0 -> 1L))((previousMap, n) =>
+    previousMap + (n ->
+      (previousMap.getOrElse(n - 1, 0L) +
+        previousMap.getOrElse(n - 2, 0L) +
+        previousMap.getOrElse(n - 3, 0L)) )
+  )
 
   println("Day10B:")
-  println(now)
+  println(numberOfWays.get(output))
 
 }
