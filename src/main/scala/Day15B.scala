@@ -3,54 +3,35 @@ import better.files._
 import scala.annotation.tailrec
 
 object Day15B extends App {
-  val f = file"./files/day15/example"
+  val f = file"./files/day15/input"
 
-  val startingNumbers: Array[Long] = f.lines.head.split(",").map(_.toLong)
+  val startingNumbers: Array[Int] = f.lines.head.split(",").map(_.toInt)
   val startingNumbersLength = startingNumbers.length
-  val indexToKnow = 300000000
-  val percentage = (indexToKnow / 100).intValue
+  val turnToKnow = 30000000
 
-  val numbers : Array[Long] = Array.fill(indexToKnow + 1)(0L)
-  startingNumbers.copyToArray(numbers)
+  val turnValueWasLastSpoken: Array[Int] = Array.fill(turnToKnow + 1)(-1)
+  startingNumbers.toSeq.zipWithIndex.reverse.tail.reverse.foreach { case (number, index) => turnValueWasLastSpoken(number) = index + 1 }
 
-
-//  case class Value(index: Int, v: Long)
-//
-//  def nextValue(previousValuesReversed: List[Long]): Long = previousValuesReversed match {
-//    case x :: xs =>
-//      val howManyTurnsApart = xs.indexOf(x) + 1
-//      if (howManyTurnsApart == 0) // never spoken before
-//        0L
-//      else
-//        howManyTurnsApart
-//  }
-//
-  @tailrec
-  def nextValue(indexToConsider: Int, indexOfPreviousValue : Int, previousValue : Long) : Long =
-    if (indexToConsider == -1)
-      0L
-    else if (numbers(indexToConsider) == previousValue)
-      indexOfPreviousValue - indexToConsider
+  def determineCurrentValue(previousTurn: Int, previousValue: Int): Int =
+    if (turnValueWasLastSpoken(previousValue) == -1)
+      0
     else
-      nextValue(indexToConsider - 1, indexOfPreviousValue, previousValue)
-
+      previousTurn - turnValueWasLastSpoken(previousValue)
 
   @tailrec
-  def determineNumberAtIndex(currentIndex : Int) : Unit = {
-    if ((currentIndex % percentage) == 0) {
-      println(currentIndex / percentage)
-    }
+  def determineValueAtTurn(currentTurn: Int, previousValue: Int): Int = {
+    val previousTurn = currentTurn - 1
+    val currentValue = determineCurrentValue(previousTurn, previousValue)
 
-    if (currentIndex == indexToKnow)
-      numbers(currentIndex)
+    if (currentTurn == turnToKnow)
+      currentValue
     else {
-      numbers(currentIndex) = nextValue(currentIndex - 2, currentIndex - 1, numbers(currentIndex - 1))
-      determineNumberAtIndex(currentIndex + 1)
+      turnValueWasLastSpoken(previousValue) = previousTurn
+      determineValueAtTurn(currentTurn + 1, currentValue)
     }
-}
-  determineNumberAtIndex(startingNumbersLength)
+  }
 
   println("Day15B:")
-  println(numbers(indexToKnow - 1))
+  println(determineValueAtTurn(startingNumbersLength + 1, startingNumbers.last))
 
 }
